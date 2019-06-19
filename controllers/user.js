@@ -4,12 +4,13 @@ const _ = require('lodash');
 const User = require('../models/user');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const key = require('../config/config');
 
-const SEND_GRID_API_KEY = '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';
+const SEND_GRID_API_KEY = 'sedn_grikey_';
 const transporter = nodemailer.createTransport(
 	sendgridTransport({
 		auth: {
-			api_key: SEND_GRID_API_KEY
+			api_key: key.SEND_GRID_API_KEY;
 		}
 	})
 );
