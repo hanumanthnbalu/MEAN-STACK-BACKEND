@@ -1,0 +1,24 @@
+const mongoose = require('mongoose');
+
+const postSchema = mongoose.Schema({
+	title: {
+		type: String,
+		required: true,
+		trim: true
+	},	
+	content: {
+		type: String,
+		required: true,
+		trim: true
+	},
+	imagePath: {
+		type: String,
+		required: true
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now
+	}
+});
+
+module.exports = mongoose.model('post', postSchema);
