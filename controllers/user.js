@@ -10,7 +10,7 @@ const SEND_GRID_API_KEY = 'sedn_grikey_';
 const transporter = nodemailer.createTransport(
 	sendgridTransport({
 		auth: {
-			api_key: key.SEND_GRID_API_KEY;
+			api_key: key.SEND_GRID_API_KEY
 		}
 	})
 );
