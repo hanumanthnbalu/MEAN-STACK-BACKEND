@@ -6,7 +6,6 @@ const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const key = require('../config/config');
 
-const SEND_GRID_API_KEY = 'sedn_grikey_';
 const transporter = nodemailer.createTransport(
 	sendgridTransport({
 		auth: {
@@ -151,8 +150,10 @@ exports.userLogin = async (req, res, next) => {
 		// console.log(token);
 		res.status(200).json({
 			message: 'Login Successfull!!',
-			user: _.pick(user, [ 'username', 'email' ]),
-			token: token
+			username: user.username,
+			token: token,
+			userId: user._id,
+			expiresIn: 3600
 		});
 	} catch (err) {
 		res.status(500).json({
