@@ -6,8 +6,11 @@ exports.createPost = async (req, res, next) => {
 		const post = new Post({
 		  title: req.body.title,
 		  content: req.body.content,
-		  imagePath: url + "/images/" + req.file.filename
+		  imagePath: url + "/images/" + req.file.filename,
+		  creator: req.user.userId
 		});
+		// console.log(req.user.userId);
+		// return res.status(200).json({});
 		post.save();
 		res.status(201).send({
 			message: 'Post created successfully!',
@@ -15,8 +18,8 @@ exports.createPost = async (req, res, next) => {
 		});
 	} catch (err) {
 		res.status(500).send({
-			message: 'Post not created!',
-			err: err
+			message: 'Post not created! please try again',
+			// err: err
 		});
 	}
 };
@@ -38,7 +41,7 @@ exports.getPost = async (req, res, next) => {
 	} catch (err) {
 		res.status(500).send({
 			message: 'Something not right!',
-			err: err
+			// err: err
 		});
 	}
 };
@@ -68,7 +71,7 @@ exports.getPosts = async (req, res, next) => {
 	} catch (err) {
 		res.status(500).send({
 			message: 'Something not right!',
-			err: err
+			// err: err
 		});
 	}
 };
@@ -79,6 +82,8 @@ exports.updatePost = async (req, res, next) => {
 		const title = req.body.title;
 		const content = req.body.content;
 		let imagePath = req.body.imagePath;
+		const creator = req.user.userId ;
+		console.log(creator);
 
 		if(req.file) {
 			const url = req.protocol + '://' + req.get('host');
@@ -87,9 +92,10 @@ exports.updatePost = async (req, res, next) => {
 		const post = new Post({
 			title: title,
 			content: content,
-			imagePath: imagePath
+			imagePath: imagePath,
+			creator: creator
 		});
-		const result = await Post.findByIdAndUpdate({ _id: id }, { $set: { title: title, content: content , imagePath:imagePath} });
+		const result = await Post.updateOne({ _id: id , creator:creator}, { $set: { title: title, content: content , imagePath:imagePath} });
 		if (!result) {
 			return res.status(404).send({
 				message: 'Post not found!'
@@ -97,14 +103,20 @@ exports.updatePost = async (req, res, next) => {
 		}
 		// result.save();
 		console.log(result);
-		res.status(200).send({
-			message: 'Post Updated!',
-			post: post
-		});
+		if(result.nModified > 0 || result.n > 0) {
+			return res.status(200).send({
+				message: 'Post Updated!',
+				post: post
+			});
+		} else {
+			res.status(401).send({
+				message: 'Not Authorized!'
+			});
+		}
 	} catch (err) {
 		res.status(500).send({
 			message: 'Something not right!',
-			err: err.message
+			// err: err.message
 		});
 	}
 };
@@ -112,9 +124,9 @@ exports.updatePost = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
 	try {
 		const id = req.params.id;
-		const post = await Post.deleteOne({ _id: id });
+		const post = await Post.deleteOne({ _id: id, creator:req.user.userId });
 		if (!post) {
-			return res.status(401).send({
+			return res.status(404).send({
 				message: 'Post not found!'
 			});
 		}
@@ -128,7 +140,7 @@ exports.deletePost = async (req, res, next) => {
 	} catch (err) {
 		res.status(500).send({
 			message: 'Something not right!',
-			err: err
+			// err: err
 		});
 	}
 };
